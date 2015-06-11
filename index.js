@@ -63,11 +63,22 @@ Request.prototype.send = function (data) {
 };
 
 Request.prototype.end = function () {
-    var res = syncRequest(this._method, this._url, { headers: this._headers, body: this._body, qs: this._qs });
+    var res = { };
 
+    try {
+        res = syncRequest(this._method, this._url, { headers: this._headers, body: this._body, qs: this._qs });
+    } catch (e) {
+        res.statusCode = 404;
+        res.error = e;
+    }
+
+    res.request = this;
     res.json = function (encoding) {
         return safe.JSON.parse(this.getBody(encoding || 'utf8'));
     };
+    res.text = res.getBody(); // raw buffer
+    res.body = safe.JSON.parse(res.getBody('utf8'));
+
     return res;
 };
 
