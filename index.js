@@ -71,11 +71,7 @@ Request.prototype.retry = function (count) {
 };
 
 Request.prototype.end = function () {
-    var res;
-    for (var i = 0; i < this._tryCount; i++) {
-        res = this._makeRequest();
-        if (res.statusCode >= 200 && res.statusCode <= 299) return res;
-    }
+    var res = this._makeRequest();
     return res;
 };
 
@@ -83,7 +79,7 @@ Request.prototype._makeRequest = function () {
     var res = { };
 
     try {
-        res = syncRequest(this._method, this._url, { headers: this._headers, body: this._body, qs: this._qs });
+        res = syncRequest(this._method, this._url, { headers: this._headers, body: this._body, qs: this._qs, retry: true, maxRetries: this._tryCount });
         res.text = res.getBody(); // raw buffer
         res.body = safe.JSON.parse(res.getBody('utf8'));
     } catch (e) {
