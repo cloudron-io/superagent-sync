@@ -5,36 +5,39 @@ var safe = require('safetydance'),
 
 exports = module.exports = {
     get: get,
-    post: post
+    post: post,
+    put: put,
+    del: del,
+    head: head
 };
 
 function get(url) {
-    return new Request().get(url);
+    return new Request('GET', url);
 }
 
 function post(url) {
-    return new Request().post(url);
+    return new Request('POST', url);
 }
 
-function Request() {
-    this._method = '';
-    this._url = '';
+function put(url) {
+    return new Request('PUT', url);
+}
+
+function del(url) {
+    return new Request('DELETE', url);
+}
+
+function head(url) {
+    return new Request('HEAD', url);
+}
+
+function Request(method, url) {
+    this._method = method;
+    this._url = url;
     this._headers = { };
     this._body = null;
     this._qs = null;
 }
-
-Request.prototype.get = function (url) {
-    this._method = 'GET';
-    this._url = url;
-    return this;
-};
-
-Request.prototype.post = function (url) {
-    this._method = 'POST';
-    this._url = url;
-    return this;
-};
 
 Request.prototype.auth = function (user, pass) {
     var str = new Buffer(user + ':' + pass).toString('base64');
@@ -67,6 +70,8 @@ Request.prototype.end = function () {
 
     try {
         res = syncRequest(this._method, this._url, { headers: this._headers, body: this._body, qs: this._qs });
+        res.text = res.getBody(); // raw buffer
+        res.body = safe.JSON.parse(res.getBody('utf8'));
     } catch (e) {
         res.statusCode = 404;
         res.error = e;
@@ -76,8 +81,6 @@ Request.prototype.end = function () {
     res.json = function (encoding) {
         return safe.JSON.parse(this.getBody(encoding || 'utf8'));
     };
-    res.text = res.getBody(); // raw buffer
-    res.body = safe.JSON.parse(res.getBody('utf8'));
 
     return res;
 };
