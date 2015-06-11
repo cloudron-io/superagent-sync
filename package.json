@@ -1,0 +1,15 @@
+{
+  "name": "superagent-sync",
+  "version": "0.0.2",
+  "description": "Synchronous HTTP request with superagent like API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Girish Ramakrishnan",
+  "license": "ISC",
+  "dependencies": {
+    "safetydance": "0.0.16",
+    "sync-request": "^2.0.1"
+  }
+}
