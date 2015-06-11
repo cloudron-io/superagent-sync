@@ -80,8 +80,8 @@ Request.prototype._makeRequest = function () {
 
     try {
         res = syncRequest(this._method, this._url, { headers: this._headers, body: this._body, qs: this._qs, retry: true, maxRetries: this._tryCount });
-        res.text = res.getBody(); // raw buffer
-        res.body = safe.JSON.parse(res.getBody('utf8'));
+        res.text = res.body;
+        res.body = safe.JSON.parse(res.body.toString('utf8'));
     } catch (e) {
         res.statusCode = 404;
         res.error = e;
@@ -89,7 +89,7 @@ Request.prototype._makeRequest = function () {
 
     res.request = this;
     res.json = function (encoding) {
-        return safe.JSON.parse(this.getBody(encoding || 'utf8'));
+        return safe.JSON.parse(this.getBody(encoding || 'utf8')); // getBody throws!
     };
 
     return res;
