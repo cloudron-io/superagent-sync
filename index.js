@@ -37,6 +37,7 @@ function Request(method, url) {
     this._headers = { };
     this._body = null;
     this._qs = null;
+    this._tryCount = 1;
 }
 
 Request.prototype.auth = function (user, pass) {
@@ -65,7 +66,20 @@ Request.prototype.send = function (data) {
     return this;
 };
 
+Request.prototype.retry = function (count) {
+    this._tryCount = count + 1;
+};
+
 Request.prototype.end = function () {
+    var res;
+    for (var i = 0; i < this._tryCount; i++) {
+        res = this._makeRequest();
+        if (res.statusCode >= 200 && res.statusCode <= 299) return res;
+    }
+    return res;
+};
+
+Request.prototype._makeRequest = function () {
     var res = { };
 
     try {
