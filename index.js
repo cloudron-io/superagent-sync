@@ -81,7 +81,8 @@ Request.prototype._makeRequest = function () {
 
     try {
         res = syncRequest(this._method, this._url, { headers: this._headers, body: this._body, qs: this._qs, retry: true, maxRetries: this._tryCount });
-        res.text = res.body;
+        res.buffer = res.body;
+        res.text = res.body.toString('utf8'); // TODO: get encoding from content-encoding
         res.body = safe.JSON.parse(res.body.toString('utf8'));
     } catch (e) {
         res.statusCode = 404;
