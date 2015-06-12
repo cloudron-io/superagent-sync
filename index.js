@@ -1,6 +1,7 @@
 'use strict';
 
-var safe = require('safetydance'),
+var querystring = require('querystring'),
+    safe = require('safetydance'),
     syncRequest = require('sync-request');
 
 exports = module.exports = {
