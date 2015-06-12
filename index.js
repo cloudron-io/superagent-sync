@@ -75,6 +75,7 @@ Request.prototype.redirects = function (count) {
     } else {
         this._maxRedirects = count;
     }
+    return this;
 };
 
 Request.prototype.retry = function (count) {
