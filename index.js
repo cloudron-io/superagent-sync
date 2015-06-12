@@ -39,6 +39,8 @@ function Request(method, url) {
     this._body = null;
     this._qs = null;
     this._tryCount = 1;
+    this._followRedirects = true;
+    this._maxRedirects = Infinity;
 }
 
 Request.prototype.auth = function (user, pass) {
@@ -67,6 +69,14 @@ Request.prototype.send = function (data) {
     return this;
 };
 
+Request.prototype.redirects = function (count) {
+    if (!count) {
+        this._followRedirects = false;
+    } else {
+        this._maxRedirects = count;
+    }
+};
+
 Request.prototype.retry = function (count) {
     this._tryCount = count + 1;
     return this;
@@ -81,7 +91,15 @@ Request.prototype._makeRequest = function () {
     var res = { };
 
     try {
-        res = syncRequest(this._method, this._url, { headers: this._headers, body: this._body, qs: this._qs, retry: true, maxRetries: this._tryCount });
+        res = syncRequest(this._method, this._url, {
+            headers: this._headers,
+            body: this._body,
+            qs: this._qs,
+            retry: true,
+            maxRetries: this._tryCount,
+            followRedirects: this._followRedirects,
+            maxRedirects: this._maxRedirects
+        });
         res.buffer = res.body;
         res.text = res.body.toString('utf8'); // TODO: get encoding from content-encoding
         res.body = safe.JSON.parse(res.body.toString('utf8'));
