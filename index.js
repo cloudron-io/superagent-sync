@@ -68,6 +68,7 @@ Request.prototype.send = function (data) {
 
 Request.prototype.retry = function (count) {
     this._tryCount = count + 1;
+    return this;
 };
 
 Request.prototype.end = function () {
