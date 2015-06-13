@@ -9,6 +9,7 @@
   "author": "Girish Ramakrishnan",
   "license": "ISC",
   "dependencies": {
+    "debug": "^2.2.0",
     "safetydance": "0.0.16",
     "sleep": "^2.0.0",
     "sync-request": "^2.0.1"

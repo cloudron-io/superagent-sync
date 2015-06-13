@@ -3,7 +3,8 @@
 var querystring = require('querystring'),
     safe = require('safetydance'),
     usleep = require('sleep').usleep,
-    syncRequest = require('sync-request');
+    syncRequest = require('sync-request'),
+    debug = require('debug')('superagent-sync');
 
 exports = module.exports = {
     get: get,
@@ -94,6 +95,7 @@ Request.prototype.end = function () {
     for (var i = 0; i < this._tryCount; i++) {
         res = this._makeRequest();
         if (res.statusCode >= 200 && res.statusCode <= 299) break;
+        debug('statusCode:%s for attempt %s. retrying in %s seconds', res.statusCode, i, this._retryDelay/1000);
         usleep(this._retryDelay * 1000);
     }
 
@@ -104,6 +106,8 @@ Request.prototype._makeRequest = function () {
     var res = { };
 
     try {
+        debug('%s %s%s', this._method, this._url, this._qs ? '?' + querystring.stringify(this._qs) : '');
+
         res = syncRequest(this._method, this._url, {
             headers: this._headers,
             body: this._body,
@@ -116,6 +120,7 @@ Request.prototype._makeRequest = function () {
         res.text = res.body.toString('utf8'); // TODO: get encoding from content-encoding
         res.body = safe.JSON.parse(res.body.toString('utf8'));
     } catch (e) {
+        debug('%s caused an exception: %s', this._url, e);
         res.statusCode = 404;
         res.error = e;
     }
