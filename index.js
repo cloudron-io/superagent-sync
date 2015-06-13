@@ -2,6 +2,7 @@
 
 var querystring = require('querystring'),
     safe = require('safetydance'),
+    usleep = require('sleep').usleep,
     syncRequest = require('sync-request');
 
 exports = module.exports = {
@@ -38,9 +39,10 @@ function Request(method, url) {
     this._headers = { };
     this._body = null;
     this._qs = null;
-    this._tryCount = 1;
+    this._tryCount = method === 'GET' ? 5 : 1;
     this._followRedirects = false;
     this._maxRedirects = Infinity;
+    this._retryDelay = 5000; // 5 s
 }
 
 Request.prototype.auth = function (user, pass) {
@@ -86,7 +88,15 @@ Request.prototype.retry = function (count) {
 };
 
 Request.prototype.end = function () {
-    var res = this._makeRequest();
+    var res;
+
+    // implement retry by ourself since then-request throws exception at times
+    for (var i = 0; i < this._tryCount; i++) {
+        res = this._makeRequest();
+        if (res.statusCode >= 200 && res.statusCode <= 299) break;
+        usleep(this._retryDelay * 1000);
+    }
+
     return res;
 };
 
@@ -98,8 +108,7 @@ Request.prototype._makeRequest = function () {
             headers: this._headers,
             body: this._body,
             qs: this._qs,
-            retry: true,
-            maxRetries: this._tryCount,
+            retry: false,
             followRedirects: this._followRedirects,
             maxRedirects: this._maxRedirects
         });
