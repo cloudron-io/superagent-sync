@@ -39,7 +39,7 @@ function Request(method, url) {
     this._body = null;
     this._qs = null;
     this._tryCount = 1;
-    this._followRedirects = true;
+    this._followRedirects = false;
     this._maxRedirects = Infinity;
 }
 
@@ -72,7 +72,9 @@ Request.prototype.send = function (data) {
 Request.prototype.redirects = function (count) {
     if (!count) {
         this._followRedirects = false;
+        this._maxRedirects = 0;
     } else {
+        this._followRedirects = true;
         this._maxRedirects = count;
     }
     return this;
