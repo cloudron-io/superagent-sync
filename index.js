@@ -94,7 +94,7 @@ Request.prototype.end = function () {
     // implement retry by ourself since then-request throws exception at times
     for (var i = 0; i < this._tryCount; i++) {
         res = this._makeRequest();
-        if (res.statusCode >= 200 && res.statusCode <= 299) break;
+        if (res.statusCode < 400) break;
         debug('statusCode:%s for attempt %s. retrying in %s seconds', res.statusCode, i, this._retryDelay/1000);
         usleep(this._retryDelay * 1000);
     }
