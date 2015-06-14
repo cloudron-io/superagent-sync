@@ -89,12 +89,12 @@ Request.prototype.retry = function (count) {
 };
 
 Request.prototype.end = function () {
-    var res;
+    var res, i = 0;
 
     // implement retry by ourself since then-request throws exception at times
-    for (var i = 0; i < this._tryCount; i++) {
+    while (true) {
         res = this._makeRequest();
-        if (res.statusCode < 400) break;
+        if (res.statusCode < 400 || ++i >= this._tryCount) break;
         debug('statusCode:%s for attempt %s. retrying in %s seconds', res.statusCode, i, this._retryDelay/1000);
         usleep(this._retryDelay * 1000);
     }
