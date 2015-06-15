@@ -44,6 +44,7 @@ function Request(method, url) {
     this._followRedirects = false;
     this._maxRedirects = Infinity;
     this._retryDelay = 5000; // 5 s
+    this._bodyType = 'json';
 }
 
 Request.prototype.auth = function (user, pass) {
@@ -62,12 +63,22 @@ Request.prototype.query = function (obj) {
     return this;
 };
 
+Request.prototype.type = function (type) {
+    this._bodyType = type; // 'form' or 'json'
+    return this;
+};
+
 Request.prototype.send = function (data) {
     if (typeof data === 'string') {
         this._body = data;
     } else if (typeof data === 'object') {
-        this._headers['content-type'] = 'application/json';
-        this._body = JSON.stringify(data);
+        if (this._bodyType === 'json') {
+            this._headers['content-type'] = 'application/json';
+            this._body = JSON.stringify(data);
+        } else { // 'form'
+            this._headers['content-type'] = 'application/x-www-form-urlencoded';
+            this._body = querystring.stringify(data);
+        }
     }
     return this;
 };
