@@ -8,6 +8,11 @@
   },
   "author": "Girish Ramakrishnan",
   "license": "ISC",
+  "homepage": "https://github.com/cloudron-io/superagent-sync",
+  "repository": {
+    "type": "git",
+    "url":  "https://github.com/cloudron-io/superagent-sync.git"
+  },
   "dependencies": {
     "debug": "^2.2.0",
     "safetydance": "0.0.16",
