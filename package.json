@@ -17,5 +17,9 @@
     "debug": "^2.2.0",
     "safetydance": "0.0.16",
     "sync-request": "^2.0.1"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^3.0.0"
   }
 }
