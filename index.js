@@ -1,8 +1,8 @@
 'use strict';
 
 var querystring = require('querystring'),
+    child_process = require('child_process'),
     safe = require('safetydance'),
-    usleep = require('sleep').usleep,
     syncRequest = require('sync-request'),
     debug = require('debug')('superagent-sync');
 
@@ -13,6 +13,10 @@ exports = module.exports = {
     del: del,
     head: head
 };
+
+function sleep(timeout) {
+    child_process.execSync('sleep ' + timeout);
+}
 
 function get(url) {
     return new Request('GET', url);
@@ -43,7 +47,7 @@ function Request(method, url) {
     this._tryCount = method === 'GET' ? 5 : 1;
     this._followRedirects = false;
     this._maxRedirects = Infinity;
-    this._retryDelay = 5000; // 5 s
+    this._retryDelay = 5; // 5 s
     this._bodyType = 'json';
 }
 
@@ -106,8 +110,8 @@ Request.prototype.end = function () {
     while (true) {
         res = this._makeRequest();
         if (res.statusCode < 400 || ++i >= this._tryCount) break;
-        debug('statusCode:%s for attempt %s. retrying in %s seconds', res.statusCode, i, this._retryDelay/1000);
-        usleep(this._retryDelay * 1000);
+        debug('statusCode:%s for attempt %s. retrying in %s seconds', res.statusCode, i, this._retryDelay);
+        sleep(this._retryDelay);
     }
 
     return res;
@@ -143,4 +147,3 @@ Request.prototype._makeRequest = function () {
 
     return res;
 };
-
